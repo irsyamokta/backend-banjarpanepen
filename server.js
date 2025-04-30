@@ -15,10 +15,13 @@ import userRoutes from "./src/routes/user.routes.js";
 import articleRoutes from "./src/routes/article.routes.js";
 import packageRoutes from "./src/routes/package.routes.js";
 import eventRoutes from "./src/routes/event.routes.js";
+import galleryRoutes from "./src/routes/gallery.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",")
+    : [];
 
 app.set('trust proxy', 1);
 
@@ -55,6 +58,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/article", articleRoutes);
 app.use("/api/v1/package", packageRoutes);
 app.use("/api/v1/event", eventRoutes);
+app.use("/api/v1/gallery", galleryRoutes);
 
 app.use((err, req, res, next) => {
     res.status(err.statusCode || 500).json({
