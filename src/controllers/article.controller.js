@@ -20,7 +20,7 @@ export const getArticleById = async (req, res, next) => {
 
 export const createArticle = async (req, res, next) => {
     try {
-        const article = await articleService.createArticle(req.body, req.file);
+        const article = await articleService.createArticle(req.user.id, req.body, req.file);
         res.status(201).json(article);
     } catch (error) {
         next(error);
