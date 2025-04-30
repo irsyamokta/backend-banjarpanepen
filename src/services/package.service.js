@@ -3,8 +3,8 @@ import { uploadImage } from "../utils/upload.utils.js";
 import { packageValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
-export const getPackages = async () => {
-    const packages = await packageRepository.getPackages();
+export const getPackages = async (page, limit) => {
+    const packages = await packageRepository.getPackages(page, limit);
     return packages;
 };
 
@@ -20,10 +20,17 @@ export const createPackage = async (data, file) => {
 
     const { title, price, benefit } = data;
 
-    const numericPrice = parseInt(price, 10);
+    const parsePrice = parseInt(price, 10);
     const thumbnail = await uploadImage(file, "package");
 
-    const createPackage = await packageRepository.createPackage(data, numericPrice, thumbnail.fileUrl);
+    const dataPackage = {
+        title,
+        price: parsePrice,
+        benefit,
+        thumbnail: thumbnail.fileUrl
+    };
+
+    const createPackage = await packageRepository.createPackage(dataPackage);
     return createPackage;
 };
 
@@ -36,10 +43,17 @@ export const updatePackage = async (id, data, file) => {
 
     const { title, price, benefit } = data;
 
-    const numericPrice = parseInt(price, 10);
+    const parsePrice = parseInt(price, 10);
     const thumbnail = await uploadImage(file, "package");
 
-    const updatePackage = await packageRepository.updatePackage(id, data, numericPrice, thumbnail.fileUrl);
+    const dataPackage = {
+        title,
+        price: parsePrice,
+        benefit,
+        thumbnail: thumbnail.fileUrl
+    };
+
+    const updatePackage = await packageRepository.updatePackage(id, dataPackage);
     return updatePackage;
 };
 
