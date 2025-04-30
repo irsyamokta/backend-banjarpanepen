@@ -1,6 +1,6 @@
 import * as eventRepository from "../repositories/event.repository.js";
 import { uploadImage } from "../utils/upload.utils.js";
-import { eventValidator } from "../utils/validators/validateEvent.js";
+import { eventValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
 export const getEvents = async (page, limit) => {
