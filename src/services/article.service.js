@@ -14,25 +14,29 @@ export const getArticleById = async (id) => {
     return article;
 };
 
-export const createArticle = async (data, file) => {
+export const createArticle = async (userId, data, file) => {
     const { error } = articleValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
     
     const { title, content, writer } = data;
     const thumbnail = await uploadImage(file, "article");
 
-    const createArticle = await articleRepository.createArticle(data, thumbnail.fileUrl);
+    const createArticle = await articleRepository.createArticle(userId, data, thumbnail.fileUrl);
     return createArticle;
 };
 
 export const updateArticle = async (id, data, file) => {
+
+    const article = await articleRepository.getArticleById(id);
+    if (!article) throw new NotFoundError("Artikel tidak ditemukan");
+    
     const { error } = articleValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, content, writer } = data;
     const thumbnail = await uploadImage(file, "article");
 
-    const updateArticle = await articleRepository.updateArticle(id, data, file);
+    const updateArticle = await articleRepository.updateArticle(id, data, thumbnail.fileUrl);
     return updateArticle;
 };
 
