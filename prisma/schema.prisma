@@ -50,7 +50,7 @@ model Event {
   date        DateTime
   time        String
   place       String
-  price       BigInt?
+  price       Int?
   thumbnail   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -66,7 +66,7 @@ model Gallery {
 model TourPackage {
   id        String   @id @default(uuid())
   title     String
-  price     BigInt
+  price     Int?
   benefit   String
   thumbnail String
   createdAt DateTime @default(now())
