@@ -60,6 +60,7 @@ model Gallery {
   id        String   @id @default(uuid())
   title     String
   caption   String?
+  image     String
   createdAt DateTime @default(now())
 }
 
