@@ -2,7 +2,10 @@ import * as packageService from "../services/package.service.js";
 
 export const getPackages = async (req, res, next) => {
     try {
-        const packages = await packageService.getPackages();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const packages = await packageService.getPackages(page, limit);
         res.status(200).json(packages);
     } catch (error) {
         next(error);
