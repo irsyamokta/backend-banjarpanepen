@@ -11,6 +11,7 @@ export const uploadImage = async (file, category) => {
         let folder = "images";
         if (category === "profile") folder = `${folder}/profile`;
         if (category === "article") folder = `${folder}/article`;
+        if (category === "package") folder = `${folder}/package`;
         if (category === "event") folder = `${folder}/event`;
         if (category === "gallery") folder = `${folder}/gallery`;
 
