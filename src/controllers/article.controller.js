@@ -2,7 +2,10 @@ import * as articleService from "../services/article.service.js";
 
 export const getArticles = async (req, res, next) => {
     try {
-        const articles = await articleService.getArticles();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const articles = await articleService.getArticles(page, limit);
         res.status(200).json(articles);
     } catch (error) {
         next(error);
