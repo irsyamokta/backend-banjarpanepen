@@ -16,7 +16,7 @@ export const generateRefreshToken = (user) => {
 
 export const generateAccessToken = (user) => {
     return jwt.sign(
-        { userId: user.id, email: user.email, role: user.role, status: user.status },
+        { userId: user.id, email: user.email, role: user.role },
         ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRES }
     );
@@ -30,5 +30,5 @@ export const cookieOptions = () => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
 });
