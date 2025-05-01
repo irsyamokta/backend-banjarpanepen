@@ -8,7 +8,7 @@ const router = express.Router();
 const isAdmin = hasRole("ADMIN");
 
 router.get("/all-user", authMiddleware, isAdmin, getUsers)
-router.put("/update/:userId", authMiddleware, isAdmin, multerUpload, updateUser);
-router.delete("/delete/:userId", authMiddleware, isAdmin, deleteUser);
+router.patch("/update", authMiddleware, isAdmin, multerUpload, updateUser);
+router.delete("/delete", authMiddleware, isAdmin, deleteUser);
 
 export default router;
