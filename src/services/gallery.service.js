@@ -31,6 +31,26 @@ export const createGallery = async (data, file) => {
     return createGallery;
 };
 
+export const updateGallery = async (id, data, file) => {
+    const getGalleryById = await galleryRepository.getGalleryById(id);
+    if (!getGalleryById) throw new NotFoundError("Gallery tidak ditemukan");
+
+    const { error } = galleryValidator(data);
+    if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
+
+    const { title, caption } = data;
+    const image = await uploadImage(file, "gallery");
+
+    const dataGallery = {
+        title,
+        caption,
+        image: image.fileUrl
+    };
+
+    const updateGallery = await galleryRepository.updateGallery(id, dataGallery);
+    return updateGallery;
+};
+
 export const deleteGallery = async (id) => {
     const getGalleryById = await galleryRepository.getGalleryById(id);
     if (!getGalleryById) throw new NotFoundError("Gallery tidak ditemukan");
