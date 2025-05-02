@@ -10,7 +10,7 @@ const isAdmin = hasRole("ADMIN");
 router.get("/all-article", getArticles);
 router.get("/:id", getArticleById);
 router.post("/create-article", authMiddleware, isAdmin, multerUpload, createArticle);
-router.put("/update-article/:id", authMiddleware, isAdmin, multerUpload, updateArticle);
+router.patch("/update-article/:id", authMiddleware, isAdmin, multerUpload, updateArticle);
 router.delete("/delete-article/:id", authMiddleware, isAdmin, deleteArticle);
 
 export default router;
