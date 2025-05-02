@@ -30,6 +30,15 @@ export const createGallery = async (req, res, next) => {
     }
 };
 
+export const updateGallery = async (req, res, next) => {
+    try {
+        const gallery = await galleryService.updateGallery(req.params.id, req.body, req.file);
+        return res.status(200).json(gallery);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const deleteGallery = async (req, res, next) => {
     try {
         const gallery = await galleryService.deleteGallery(req.params.id);
