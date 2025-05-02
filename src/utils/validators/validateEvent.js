@@ -47,10 +47,10 @@ export const eventValidator = (data) => {
             }),
 
         price: Joi.number()
-            .min(3)
+            .min(10000)
             .optional()
             .messages({
-                "number.min": "Harga minimal adalah 3!"
+                "number.min": "Harga minimal adalah 10000!"
             }),
     });
 

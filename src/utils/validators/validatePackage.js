@@ -13,9 +13,9 @@ export const packageValidator = (data) => {
             }),
 
         price: Joi.number()
-            .min(3)
+            .min(10000)
             .messages({
-                "number.min": "Harga minimal adalah 3!",
+                "number.min": "Harga minimal adalah 10000!",
                 "any.required": "Harga tidak boleh kosong!"
             }),
 
