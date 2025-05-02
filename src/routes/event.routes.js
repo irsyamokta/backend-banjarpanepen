@@ -10,7 +10,7 @@ const isAdmin = hasRole("ADMIN");
 router.get("/all-event", getEvents);
 router.get("/:id", getEventById);
 router.post("/create-event", authMiddleware, isAdmin, multerUpload, createEvent);
-router.put("/update-event/:id", authMiddleware, isAdmin, multerUpload, updateEvent);
+router.patch("/update-event/:id", authMiddleware, isAdmin, multerUpload, updateEvent);
 router.delete("/delete-event/:id", authMiddleware, isAdmin, deleteEvent);
 
 export default router;
