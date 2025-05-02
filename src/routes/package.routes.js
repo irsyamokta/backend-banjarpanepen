@@ -10,7 +10,7 @@ const isAdmin = hasRole("ADMIN");
 router.get("/all-package", getPackages);
 router.get("/:id", getPackageById);
 router.post("/create-package", authMiddleware, isAdmin, multerUpload, createPackage);
-router.put("/update-package/:id", authMiddleware, isAdmin, multerUpload, updatePackage);
+router.patch("/update-package/:id", authMiddleware, isAdmin, multerUpload, updatePackage);
 router.delete("/delete-package/:id", authMiddleware, isAdmin, deletePackage);
 
 export default router;
