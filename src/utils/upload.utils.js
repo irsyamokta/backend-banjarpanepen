@@ -45,3 +45,14 @@ const uploadToGCS = (file, folder) => {
         blobStream.end(file.buffer);
     });
 };
+
+export const deleteImageFromGCS = async (fileUrl) => {
+    try {
+        const filePath = fileUrl.replace(`https://storage.googleapis.com/${bucket.name}/`, '');
+        const file = bucket.file(filePath);
+
+        await file.delete();
+    } catch (err) {
+        throw new BadRequestError("Gagal menghapus gambar!", ["Delete image error"]);
+    }
+};
