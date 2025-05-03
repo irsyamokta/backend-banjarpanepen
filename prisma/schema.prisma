@@ -26,21 +26,21 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  articlesEdited    Article[] @relation("EditedBy")
-  sessions          Session[]
+  articlesEdited Article[] @relation("EditedBy")
+  sessions       Session[]
 }
 
 model Article {
-  id         String   @id @default(uuid())
-  title      String
-  content    String   @db.LongText
-  writer     String
-  thumbnail  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.LongText
+  writer    String
+  thumbnail String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  editor     User?    @relation("EditedBy", fields: [editorId], references: [id])
-  editorId   String?
+  editor   User?   @relation("EditedBy", fields: [editorId], references: [id])
+  editorId String?
 }
 
 model Event {
@@ -64,6 +64,21 @@ model Gallery {
   createdAt DateTime @default(now())
 }
 
+model Tour {
+  id          String   @id @default(uuid())
+  title       String
+  about       String   @db.LongText
+  operational String
+  start       String?
+  end         String?
+  facility    String
+  maps        String?
+  price       Int
+  thumbnail   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model TourPackage {
   id        String   @id @default(uuid())
   title     String
@@ -83,6 +98,6 @@ model Session {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }
