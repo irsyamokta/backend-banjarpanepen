@@ -1,5 +1,5 @@
 import * as tourRepository from "../repositories/tour.repository.js";
-import { uploadImage } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
 import { tourValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -18,7 +18,7 @@ export const createTour = async (data, file) => {
     const { error } = tourValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
-    const { title, about, operational, start, end, facility, maps, price } = data;
+    const { title, about, operational, location, start, end, facility, maps, price } = data;
     const thumbnail = await uploadImage(file, "tour");
 
     const parsePrice = parseInt(price, 10);
@@ -27,6 +27,7 @@ export const createTour = async (data, file) => {
         title,
         about,
         operational,
+        location,
         start,
         end,
         facility,
@@ -46,21 +47,29 @@ export const updateTour = async (id, data, file) => {
     const { error } = tourValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
-    const { title, about, operational, start, end, facility, maps, price } = data;
-    const thumbnail = await uploadImage(file, "tour");
-
+    const { title, about, operational, location, start, end, facility, maps, price } = data;
+    let thumbnail = tour.thumbnail;
     const parsePrice = parseInt(price, 10);
+
+    if (file) {
+        if (thumbnail) {
+            await deleteImageFromGCS(thumbnail);
+        }
+        const uploadResult = await uploadImage(file, "tour");
+        thumbnail = uploadResult.fileUrl;
+    }
 
     const dataTour = {
         title,
         about,
         operational,
+        location,
         start,
         end,
         facility,
         maps,
         price: parsePrice,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: thumbnail
     };
 
     const updateTour = await tourRepository.updateTour(id, dataTour);
@@ -71,6 +80,10 @@ export const deleteTour = async (id) => {
     const getTourById = await tourRepository.getTourById(id);
     if (!getTourById) throw new NotFoundError("Tour tidak ditemukan");
 
-    const deleteTour = await tourRepository.deleteTour(id);
+    if (getTourById.thumbnail) {
+        await deleteImageFromGCS(getTourById.thumbnail);
+    }
+
+    await tourRepository.deleteTour(id);
     return { message: "Wisata berhasil dihapus" };
 };
