@@ -30,6 +30,14 @@ export const tourValidator = (data) => {
                 "any.required": "Operasional tidak boleh kosong!"
             }),
 
+        location: Joi.string()
+            .min(3)
+            .required()
+            .messages({
+                "string.min": "Lokasi minimal harus 3 karakter!",
+                "any.required": "Lokasi tidak boleh kosong!"
+            }),
+
         start: Joi.string()
             .pattern(timePattern)
             .required()
@@ -52,8 +60,11 @@ export const tourValidator = (data) => {
                 "any.required": "Fasilitas tidak boleh kosong!"
             }),
 
-        maps: Joi.string()
-            .optional(),
+        maps: Joi.alternatives().try(
+            Joi.string(),
+            Joi.valid(null),
+            Joi.valid('')
+        ).optional(),
         
         price: Joi.number()
             .min(10000)
