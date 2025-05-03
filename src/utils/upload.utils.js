@@ -14,6 +14,7 @@ export const uploadImage = async (file, category) => {
         if (category === "package") folder = `${folder}/package`;
         if (category === "event") folder = `${folder}/event`;
         if (category === "gallery") folder = `${folder}/gallery`;
+        if (category === "tour") folder = `${folder}/tour`;
 
         const fileUrl = await uploadToGCS(file, folder);
         return { message: "Gambar berhasil diupload!", fileUrl };
