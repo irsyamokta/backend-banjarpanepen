@@ -68,6 +68,7 @@ model Tour {
   id          String   @id @default(uuid())
   title       String
   about       String   @db.LongText
+  location    String?
   operational String
   start       String?
   end         String?
