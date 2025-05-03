@@ -4,6 +4,7 @@ import { articleValidator } from "./validateArticle.js";
 import { packageValidator } from "./validatePackage.js";
 import { eventValidator } from "./validateEvent.js";
 import { galleryValidator } from "./validateGallery.js";
+import { tourValidator } from "./validateTour.js";
 // import { createArticleValidator, updateArticleValidator } from "./validateArticle.js";
 // import { changePasswordValidator, resetPasswordValidator, forgotPasswordValidator } from "./validatePassword.js";
 // import { createNewsValidator, updateNewsValidator, newsStatusValidator } from "./validateNews.js";
@@ -16,6 +17,7 @@ export {
     packageValidator,
     eventValidator,
     galleryValidator,
+    tourValidator,
     // changePasswordValidator, 
     // resetPasswordValidator, 
     // forgotPasswordValidator,
