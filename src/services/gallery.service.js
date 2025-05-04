@@ -1,5 +1,5 @@
 import * as galleryRepository from "../repositories/gallery.repository.js";
-import { uploadImage } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
 import { galleryValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -39,12 +39,20 @@ export const updateGallery = async (id, data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, caption } = data;
-    const image = await uploadImage(file, "gallery");
+    let image = getGalleryById.image;
+
+    if (file) {
+        if (image) {
+            await deleteImageFromGCS(image);
+        }
+        const uploadResult = await uploadImage(file, "gallery");
+        image = uploadResult.fileUrl;
+    }
 
     const dataGallery = {
         title,
         caption,
-        image: image.fileUrl
+        image: image
     };
 
     const updateGallery = await galleryRepository.updateGallery(id, dataGallery);
@@ -54,6 +62,10 @@ export const updateGallery = async (id, data, file) => {
 export const deleteGallery = async (id) => {
     const getGalleryById = await galleryRepository.getGalleryById(id);
     if (!getGalleryById) throw new NotFoundError("Gallery tidak ditemukan");
+
+    if (getGalleryById.image) {
+        await deleteImageFromGCS(getGalleryById.image);
+    }
 
     await galleryRepository.deleteGallery(id);
     return { message: "Gallery berhasil dihapus" };

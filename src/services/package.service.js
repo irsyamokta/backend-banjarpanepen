@@ -1,5 +1,5 @@
 import * as packageRepository from "../repositories/package.repository.js";
-import { uploadImage } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
 import { packageValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -44,13 +44,21 @@ export const updatePackage = async (id, data, file) => {
     const { title, price, benefit } = data;
 
     const parsePrice = parseInt(price, 10);
-    const thumbnail = await uploadImage(file, "package");
+    let thumbnail = getPackageById.thumbnail;
+
+    if (file) {
+        if (thumbnail) {
+            await deleteImageFromGCS(thumbnail);
+        }
+        const uploadResult = await uploadImage(file, "package");
+        thumbnail = uploadResult.fileUrl;
+    }
 
     const dataPackage = {
         title,
         price: parsePrice,
         benefit,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: thumbnail
     };
 
     const updatePackage = await packageRepository.updatePackage(id, dataPackage);
@@ -60,6 +68,10 @@ export const updatePackage = async (id, data, file) => {
 export const deletePackage = async (id) => {
     const getPackageById = await packageRepository.getPackageById(id);
     if (!getPackageById) throw new NotFoundError("Package tidak ditemukan");
+
+    if (getPackageById.thumbnail) {
+        await deleteImageFromGCS(getPackageById.thumbnail);
+    }
 
     await packageRepository.deletePackage(id);
     return { message: "Package berhasil dihapus" };

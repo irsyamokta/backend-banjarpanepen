@@ -1,5 +1,5 @@
 import * as articleRepository from "../repositories/article.repository.js";
-import { uploadImage } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
 import { articleValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -17,7 +17,7 @@ export const getArticleById = async (id) => {
 export const createArticle = async (userId, data, file) => {
     const { error } = articleValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
-    
+
     const { title, content, writer } = data;
     const thumbnail = await uploadImage(file, "article");
 
@@ -42,13 +42,21 @@ export const updateArticle = async (id, data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, content, writer } = data;
-    const thumbnail = await uploadImage(file, "article");
+    let thumbnail = article.thumbnail;
+
+    if (file) {
+        if (thumbnail) {
+            await deleteImageFromGCS(thumbnail);
+        }
+        const uploadResult = await uploadImage(file, "article");
+        thumbnail = uploadResult.fileUrl;
+    }
 
     const dataArticle = {
         title,
         content,
         writer,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: thumbnail
     };
 
     const updateArticle = await articleRepository.updateArticle(id, dataArticle);
@@ -58,6 +66,10 @@ export const updateArticle = async (id, data, file) => {
 export const deleteArticle = async (id) => {
     const article = await articleRepository.getArticleById(id);
     if (!article) throw new NotFoundError("Artikel tidak ditemukan");
+
+    if (article.thumbnail) {
+        await deleteImageFromGCS(article.thumbnail);
+    }
 
     await articleRepository.deleteArticle(id);
     return { message: "Artikel berhasil dihapus" };

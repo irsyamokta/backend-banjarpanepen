@@ -1,5 +1,5 @@
 import * as eventRepository from "../repositories/event.repository.js";
-import { uploadImage } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
 import { eventValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -46,7 +46,15 @@ export const updateEvent = async (id, data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, description, date, time, place, price } = data;
-    const thumbnail = await uploadImage(file, "event");
+    let thumbnail = event.thumbnail;
+
+    if (file) {
+        if (thumbnail) {
+            await deleteImageFromGCS(thumbnail);
+        }
+        const uploadResult = await uploadImage(file, "event");
+        thumbnail = uploadResult.fileUrl;
+    }
 
     const parsePrice = parseInt(price, 10);
     const pasrseDate = new Date(date);
@@ -58,7 +66,7 @@ export const updateEvent = async (id, data, file) => {
         time,
         place,
         price: parsePrice,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: thumbnail
     };
 
     const updateEvent = await eventRepository.updateEvent(id, dataEvent);
@@ -68,6 +76,10 @@ export const updateEvent = async (id, data, file) => {
 export const deleteEvent = async (id) => {
     const event = await eventRepository.getEventById(id);
     if (!event) throw new NotFoundError("Event tidak ditemukan");
+
+    if (event.thumbnail) {
+        await deleteImageFromGCS(event.thumbnail);
+    }
 
     await eventRepository.deleteEvent(id);
     return { message: "Event berhasil dihapus" };
