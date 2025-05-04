@@ -1,6 +1,8 @@
 import Joi from "joi";
 
 export const eventValidator = (data) => {
+    const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
     const schema = Joi.object({
         title: Joi.string()
             .min(3)
@@ -31,11 +33,11 @@ export const eventValidator = (data) => {
             }),
 
         time: Joi.string()
-            .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
+            .pattern(timePattern)
             .required()
             .messages({
-                "string.pattern.base": "Waktu harus dalam format HH:mm (24 jam)!",
-                "any.required": "Waktu tidak boleh kosong!"
+                "string.pattern.base": "Format jam mulai harus HH:mm (contoh: 08:00)",
+                "any.required": "Jam mulai tidak boleh kosong!"
             }),
 
         place: Joi.string()
