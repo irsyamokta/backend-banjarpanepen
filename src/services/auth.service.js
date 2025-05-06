@@ -19,7 +19,7 @@ export const register = async (data) => {
     const hashedPassword = await hashPassword(password);
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    const user = await authRepository.createUser({ name, email, password: hashedPassword, verificationToken });
+    const user = await authRepository.createUser({ name, email, phone, password: hashedPassword, verificationToken });
     await emailService.sendVerificationEmail(name, email, verificationToken);
     return { message: "Akun berhasil dibuat. Silakan verifikasi email Anda", data: { id: user.id, name: user.name, email: user.email} };
 };
@@ -64,7 +64,7 @@ export const me = async (userId) => {
     const user = await userRepository.getUserById(userId);
     if (!user) throw new UnauthorizedError("Tidak ada token yang diberikan");
 
-    return { id: user.id, name: user.name, email: user.email, role: user.role, imageUrl: user.imageUrl };
+    return { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, imageUrl: user.imageUrl, instagram: user.instagram };
 };
 
 export const verifyEmail = async (token) => {
