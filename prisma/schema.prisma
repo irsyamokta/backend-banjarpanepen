@@ -73,7 +73,7 @@ model Tour {
   start       String?
   end         String?
   facility    String
-  maps        String?
+  maps        String?  @db.LongText
   price       Int
   thumbnail   String
   createdAt   DateTime @default(now())
