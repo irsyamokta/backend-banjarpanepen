@@ -10,6 +10,11 @@ export const getUsers = async () => {
     return { user };
 };
 
+export const getUserByContact = async () => {
+    const user = await userRepository.getUserByContact();
+    return { user };
+}
+
 export const updateUser = async (userId, data, file) => {
     const { error } = updateUserValidator(data);
     if (error) {
@@ -20,7 +25,7 @@ export const updateUser = async (userId, data, file) => {
     const user = await userRepository.getUserById(userId, { email: true, imageUrl: true });
     if (!user) throw new NotFoundError("Akun tidak ditemukan");
 
-    const { name, email } = data;
+    const { name, phone, email, instagram } = data;
     let profile = user.imageUrl;
 
     if (file) {
@@ -31,7 +36,7 @@ export const updateUser = async (userId, data, file) => {
         profile = uploadResult.fileUrl;
     }
 
-    let updateData = { name, imageUrl: profile };
+    let updateData = { name, phone, imageUrl: profile, instagram };
     let message = "User profile berhasil diperbarui";
 
     if (email && email !== user.email) {
