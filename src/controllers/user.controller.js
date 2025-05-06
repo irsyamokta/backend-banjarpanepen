@@ -9,6 +9,15 @@ export const getUsers = async (req, res, next) => {
     }
 };
 
+export const getUserByContact = async (req, res, next) => {
+    try {
+        const result = await userService.getUserByContact();
+        res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateUser = async (req, res, next) => {
     try {
         const { result, message } = await userService.updateUser(req.user.id, req.body, req.file);
@@ -19,7 +28,7 @@ export const updateUser = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-    try {
+    try { 
         const result = await userService.deleteUser(req.user.id);
         res.status(200).json(result);
     } catch (error) {
