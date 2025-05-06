@@ -4,6 +4,10 @@ export const getUsers = async () => {
     return prisma.user.findMany();
 };
 
+export const getUserByContact = async () => {
+    return prisma.user.findMany({select: {phone: true, instagram: true}});
+}
+
 export const getUserById = async (userId, selectedField = null) => {
     return prisma.user.findUnique({
         where: { id: userId },
@@ -18,9 +22,11 @@ export const updateUserprofile = async (userId, data) => {
         where: { id: userId },
         data: {
             name: data.name,
-            imageUrl: data.imageUrl
+            phone: data.phone,
+            imageUrl: data.imageUrl,
+            instagram: data.instagram
         },
-        select: { id: true, name: true, imageUrl: true },
+        select: { id: true, name: true, phone: true, imageUrl: true, instagram: true },
     });
 };
 
