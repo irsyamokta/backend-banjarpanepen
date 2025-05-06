@@ -16,6 +16,8 @@ model User {
   id                String    @id @default(uuid())
   name              String
   email             String    @unique
+  phone             String?
+  instagram         String?
   password          String
   role              Role      @default(USER)
   isVerified        Boolean   @default(false)
