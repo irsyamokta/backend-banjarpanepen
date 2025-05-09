@@ -1,5 +1,5 @@
 import * as tourRepository from "../repositories/tour.repository.js";
-import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromCloudinary } from "../utils/upload.utils.js";
 import { tourValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -19,7 +19,7 @@ export const createTour = async (data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, about, operational, location, start, end, facility, maps, price } = data;
-    const thumbnail = await uploadImage(file, "tour");
+    const { fileUrl, publicId } = await uploadImage(file, "tour");
 
     const parsePrice = parseInt(price, 10);
 
@@ -33,7 +33,8 @@ export const createTour = async (data, file) => {
         facility,
         maps,
         price: parsePrice,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: fileUrl,
+        publicId: publicId
     };
 
     const createTour = await tourRepository.createTour(dataTour);
@@ -49,14 +50,16 @@ export const updateTour = async (id, data, file) => {
 
     const { title, about, operational, location, start, end, facility, maps, price } = data;
     let thumbnail = tour.thumbnail;
+    let publicId = tour.publicId;
     const parsePrice = parseInt(price, 10);
 
     if (file) {
-        if (thumbnail) {
-            await deleteImageFromGCS(thumbnail);
+        if (publicId) {
+            await deleteImageFromCloudinary(publicId);
         }
         const uploadResult = await uploadImage(file, "tour");
         thumbnail = uploadResult.fileUrl;
+        publicId = uploadResult.publicId;
     }
 
     const dataTour = {
@@ -69,7 +72,8 @@ export const updateTour = async (id, data, file) => {
         facility,
         maps,
         price: parsePrice,
-        thumbnail: thumbnail
+        thumbnail: thumbnail,
+        publicId: publicId
     };
 
     const updateTour = await tourRepository.updateTour(id, dataTour);
@@ -80,8 +84,8 @@ export const deleteTour = async (id) => {
     const getTourById = await tourRepository.getTourById(id);
     if (!getTourById) throw new NotFoundError("Tour tidak ditemukan");
 
-    if (getTourById.thumbnail) {
-        await deleteImageFromGCS(getTourById.thumbnail);
+    if (getTourById.publicId) {
+        await deleteImageFromCloudinary(getTourById.publicId);
     }
 
     await tourRepository.deleteTour(id);
