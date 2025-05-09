@@ -9,7 +9,6 @@ import hpp from "hpp";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import serverless from "serverless-http";
 
 import authRoutes from "../src/routes/auth.routes.js";
 import userRoutes from "../src/routes/user.routes.js";
@@ -21,7 +20,7 @@ import tourRoutes from "../src/routes/tour.routes.js";
 import settingRoutes from "../src/routes/setting.routes.js";
 
 const app = express();
-
+const PORT = process.env.PORT || 8080;
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(",")
     : [];
@@ -33,9 +32,6 @@ const limiter = rateLimit({
     max: 300,
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => {
-        return req.headers["x-forwarded-for"] || req.connection.remoteAddress || "unknown";
-    },
     handler: (req, res, next) => {
         res.status(429).json({
             status: "fail",
@@ -76,4 +72,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-export default serverless(app);
+app.listen(PORT, () => {
+    console.log(`Server running on PORT ${PORT}`);
+});
