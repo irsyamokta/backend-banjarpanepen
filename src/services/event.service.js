@@ -1,5 +1,5 @@
 import * as eventRepository from "../repositories/event.repository.js";
-import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromCloudinary } from "../utils/upload.utils.js";
 import { eventValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -19,7 +19,7 @@ export const createEvent = async (data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, description, date, time, place, price } = data;
-    const thumbnail = await uploadImage(file, "event");
+    const { fileUrl, publicId } = await uploadImage(file, "event");
 
     const parsePrice = parseInt(price, 10);
     const pasrseDate = new Date(date);
@@ -31,7 +31,8 @@ export const createEvent = async (data, file) => {
         time,
         place,
         price: parsePrice,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: fileUrl,
+        publicId
     };
 
     const createEvent = await eventRepository.createEvent(dataEvent);
@@ -47,13 +48,15 @@ export const updateEvent = async (id, data, file) => {
 
     const { title, description, date, time, place, price } = data;
     let thumbnail = event.thumbnail;
+    let publicId = event.publicId;
 
     if (file) {
-        if (thumbnail) {
-            await deleteImageFromGCS(thumbnail);
+        if (publicId) {
+            await deleteImageFromCloudinary(publicId);
         }
         const uploadResult = await uploadImage(file, "event");
         thumbnail = uploadResult.fileUrl;
+        publicId = uploadResult.publicId;
     }
 
     const parsePrice = parseInt(price, 10);
@@ -66,7 +69,8 @@ export const updateEvent = async (id, data, file) => {
         time,
         place,
         price: parsePrice,
-        thumbnail: thumbnail
+        thumbnail,
+        publicId
     };
 
     const updateEvent = await eventRepository.updateEvent(id, dataEvent);
@@ -77,8 +81,8 @@ export const deleteEvent = async (id) => {
     const event = await eventRepository.getEventById(id);
     if (!event) throw new NotFoundError("Event tidak ditemukan");
 
-    if (event.thumbnail) {
-        await deleteImageFromGCS(event.thumbnail);
+    if (event.publicId) {
+        await deleteImageFromCloudinary(event.publicId);
     }
 
     await eventRepository.deleteEvent(id);
