@@ -34,7 +34,7 @@ export const createTour = async (data, file) => {
         maps,
         price: parsePrice,
         thumbnail: fileUrl,
-        publicId: publicId
+        publicId
     };
 
     const createTour = await tourRepository.createTour(dataTour);
@@ -72,8 +72,8 @@ export const updateTour = async (id, data, file) => {
         facility,
         maps,
         price: parsePrice,
-        thumbnail: thumbnail,
-        publicId: publicId
+        thumbnail,
+        publicId
     };
 
     const updateTour = await tourRepository.updateTour(id, dataTour);
