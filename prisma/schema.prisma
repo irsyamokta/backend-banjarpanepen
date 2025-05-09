@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -36,7 +36,7 @@ model User {
 model Article {
   id        String   @id @default(uuid())
   title     String
-  content   String   @db.LongText
+  content   String   
   writer    String
   publicId  String?
   thumbnail String?
@@ -73,13 +73,13 @@ model Gallery {
 model Tour {
   id          String   @id @default(uuid())
   title       String
-  about       String   @db.LongText
+  about       String   
   location    String?
   operational String
   start       String?
   end         String?
   facility    String
-  maps        String?  @db.LongText
+  maps        String?  
   price       Int
   publicId    String?
   thumbnail   String
@@ -108,7 +108,7 @@ model SelectOption {
 
 model Session {
   id           String   @id @default(uuid())
-  refreshToken String   @db.LongText
+  refreshToken String   
   userAgent    String?
   ipAddress    String?
   isValid      Boolean  @default(true)
