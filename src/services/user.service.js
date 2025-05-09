@@ -38,7 +38,7 @@ export const updateUser = async (userId, data, file) => {
         publicId = uploadResult.publicId;
     }
 
-    let updateData = { name, phone, imageUrl: profile, instagram, publicId: publicId };
+    let updateData = { name, phone, imageUrl: profile, instagram, publicId };
     let message = "User profile berhasil diperbarui";
 
     if (email && email !== user.email) {
