@@ -24,6 +24,7 @@ model User {
   verificationToken String?
   resetToken        String?
   resetExpires      DateTime?
+  publicId          String?
   imageUrl          String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -37,6 +38,7 @@ model Article {
   title     String
   content   String   @db.LongText
   writer    String
+  publicId  String?
   thumbnail String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -53,6 +55,7 @@ model Event {
   time        String
   place       String
   price       Int?
+  publicId    String?
   thumbnail   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -62,6 +65,7 @@ model Gallery {
   id        String   @id @default(uuid())
   title     String
   caption   String?
+  publicId  String?
   image     String
   createdAt DateTime @default(now())
 }
@@ -77,6 +81,7 @@ model Tour {
   facility    String
   maps        String?  @db.LongText
   price       Int
+  publicId    String?
   thumbnail   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -87,6 +92,7 @@ model TourPackage {
   title     String
   price     Int?
   benefit   String
+  publicId  String?
   thumbnail String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
