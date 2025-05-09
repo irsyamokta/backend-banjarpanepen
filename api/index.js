@@ -33,6 +33,9 @@ const limiter = rateLimit({
     max: 300,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.headers["x-forwarded-for"] || req.connection.remoteAddress || "unknown";
+    },
     handler: (req, res, next) => {
         res.status(429).json({
             status: "fail",
