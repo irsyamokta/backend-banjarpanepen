@@ -17,6 +17,7 @@ import packageRoutes from "./src/routes/package.routes.js";
 import eventRoutes from "./src/routes/event.routes.js";
 import galleryRoutes from "./src/routes/gallery.routes.js";
 import tourRoutes from "./src/routes/tour.routes.js";
+import settingRoutes from "./src/routes/setting.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -26,20 +27,20 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.set('trust proxy', 1);
 
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000,
-//     max: 100,
-//     standardHeaders: true,
-//     legacyHeaders: false,
-//     handler: (req, res, next) => {
-//         res.status(429).json({
-//             status: "fail",
-//             message: "Too many requests, please try again later",
-//         });
-//     },
-// });
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res, next) => {
+        res.status(429).json({
+            status: "fail",
+            message: "Too many requests, please try again later",
+        });
+    },
+});
 
-// app.use(limiter);
+app.use(limiter);
 app.use(cors({
     origin: allowedOrigins,
     credentials: true
@@ -61,6 +62,7 @@ app.use("/api/v1/package", packageRoutes);
 app.use("/api/v1/event", eventRoutes);
 app.use("/api/v1/gallery", galleryRoutes);
 app.use("/api/v1/tour", tourRoutes);
+app.use("/api/v1/setting", settingRoutes);
 app.use("*", (req, res) => res.status(404).json({ message: "Route not found" }));
 
 app.use((err, req, res, next) => {
