@@ -26,20 +26,20 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.set('trust proxy', 1);
 
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000,
-//     max: 100,
-//     standardHeaders: true,
-//     legacyHeaders: false,
-//     handler: (req, res, next) => {
-//         res.status(429).json({
-//             status: "fail",
-//             message: "Too many requests, please try again later",
-//         });
-//     },
-// });
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res, next) => {
+        res.status(429).json({
+            status: "fail",
+            message: "Too many requests, please try again later",
+        });
+    },
+});
 
-// app.use(limiter);
+app.use(limiter);
 app.use(cors({
     origin: allowedOrigins,
     credentials: true
