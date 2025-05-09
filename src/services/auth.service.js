@@ -12,16 +12,25 @@ export const register = async (data) => {
     const { error } = registerValidator(data);
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
-    const { name, email, password } = data;
+    const { name, email, phone, password } = data;
     const existingUser = await authRepository.getUserByEmail(email);
     if (existingUser) throw new ForbiddenError("Akun sudah terdaftar");
 
     const hashedPassword = await hashPassword(password);
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    const user = await authRepository.createUser({ name, email, phone, password: hashedPassword, verificationToken });
+    const registerData = {
+        name,
+        email,
+        phone,
+        password: hashedPassword,
+        verificationToken
+    }
+
+    const user = await authRepository.createUser(registerData);
     await emailService.sendVerificationEmail(name, email, verificationToken);
-    return { message: "Akun berhasil dibuat. Silakan verifikasi email Anda", data: { id: user.id, name: user.name, email: user.email} };
+    
+    return { message: "Akun berhasil dibuat. Silakan verifikasi email Anda", data: { id: user.id, name: user.name, phone: user.phone, email: user.email } };
 };
 
 export const login = async (data, req, res) => {

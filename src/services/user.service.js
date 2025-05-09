@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import * as userRepository from "../repositories/user.repository.js"
-import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromCloudinary } from "../utils/upload.utils.js";
 import { sendVerificationEmail } from "../utils/email/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 import { updateUserValidator } from "../utils/validators/index.js";
@@ -22,21 +22,23 @@ export const updateUser = async (userId, data, file) => {
         throw new BadRequestError("Validasi gagal", message);
     }
 
-    const user = await userRepository.getUserById(userId, { email: true, imageUrl: true });
+    const user = await userRepository.getUserById(userId, { email: true, imageUrl: true, publicId: true });
     if (!user) throw new NotFoundError("Akun tidak ditemukan");
 
     const { name, phone, email, instagram } = data;
     let profile = user.imageUrl;
+    let publicId = user.publicId;
 
     if (file) {
-        if (profile) {
-            await deleteImageFromGCS(profile);
+        if (publicId) {
+            await deleteImageFromCloudinary(publicId);
         }
         const uploadResult = await uploadImage(file, "profile");
         profile = uploadResult.fileUrl;
+        publicId = uploadResult.publicId;
     }
 
-    let updateData = { name, phone, imageUrl: profile, instagram };
+    let updateData = { name, phone, imageUrl: profile, instagram, publicId };
     let message = "User profile berhasil diperbarui";
 
     if (email && email !== user.email) {
@@ -61,8 +63,8 @@ export const deleteUser = async (userId) => {
 
     if (user.role === "ADMIN") throw new BadRequestError("Anda tidak memiliki izin untuk menghapus akun ini", ["Tidak dapat menghapus akun"]);
 
-    if (user.imageUrl) {
-        await deleteImageFromGCS(user.imageUrl);
+    if (user.publicId) {
+        await deleteImageFromCloudinary(user.publicId);
     }
 
     await userRepository.deleteUser(userId);

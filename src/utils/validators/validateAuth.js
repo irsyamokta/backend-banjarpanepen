@@ -11,6 +11,17 @@ export const registerValidator = (data) => {
                 "string.max": "Nama maksimal 50 karakter!",
                 "any.required": "Nama tidak boleh kosong!"
             }),
+        
+        phone: Joi.string()
+            .min(10)
+            .max(15)
+            .regex(/^[0-9]+$/)
+            .required()
+            .messages({
+                "string.min": "Nomor telepon minimal harus 10 karakter!",
+                "string.max": "Nomor telepon maksimal 15 karakter!",
+                "any.required": "Nomor telepon tidak boleh kosong!"
+            }),
 
         email: Joi.string()
             .email()

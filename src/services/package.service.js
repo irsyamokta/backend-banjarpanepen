@@ -1,5 +1,5 @@
 import * as packageRepository from "../repositories/package.repository.js";
-import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromCloudinary } from "../utils/upload.utils.js";
 import { packageValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -21,13 +21,14 @@ export const createPackage = async (data, file) => {
     const { title, price, benefit } = data;
 
     const parsePrice = parseInt(price, 10);
-    const thumbnail = await uploadImage(file, "package");
+    const { fileUrl, publicId } = await uploadImage(file, "package");
 
     const dataPackage = {
         title,
         price: parsePrice,
         benefit,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: fileUrl,
+        publicId
     };
 
     const createPackage = await packageRepository.createPackage(dataPackage);
@@ -45,20 +46,23 @@ export const updatePackage = async (id, data, file) => {
 
     const parsePrice = parseInt(price, 10);
     let thumbnail = getPackageById.thumbnail;
+    let publicId = getPackageById.publicId;
 
     if (file) {
-        if (thumbnail) {
-            await deleteImageFromGCS(thumbnail);
+        if (publicId) {
+            await deleteImageFromCloudinary(publicId);
         }
         const uploadResult = await uploadImage(file, "package");
         thumbnail = uploadResult.fileUrl;
+        publicId = uploadResult.publicId;
     }
 
     const dataPackage = {
         title,
         price: parsePrice,
         benefit,
-        thumbnail: thumbnail
+        thumbnail,
+        publicId
     };
 
     const updatePackage = await packageRepository.updatePackage(id, dataPackage);
@@ -69,8 +73,8 @@ export const deletePackage = async (id) => {
     const getPackageById = await packageRepository.getPackageById(id);
     if (!getPackageById) throw new NotFoundError("Package tidak ditemukan");
 
-    if (getPackageById.thumbnail) {
-        await deleteImageFromGCS(getPackageById.thumbnail);
+    if (getPackageById.publicId) {
+        await deleteImageFromCloudinary(getPackageById.publicId);
     }
 
     await packageRepository.deletePackage(id);

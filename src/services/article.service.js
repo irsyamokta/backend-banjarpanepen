@@ -1,5 +1,5 @@
 import * as articleRepository from "../repositories/article.repository.js";
-import { uploadImage, deleteImageFromGCS } from "../utils/upload.utils.js";
+import { uploadImage, deleteImageFromCloudinary } from "../utils/upload.utils.js"; 
 import { articleValidator } from "../utils/validators/index.js";
 import { NotFoundError, BadRequestError } from "../utils/errors.utils.js";
 
@@ -19,14 +19,16 @@ export const createArticle = async (userId, data, file) => {
     if (error) throw new BadRequestError("Validasi gagal", error.details.map(err => err.message));
 
     const { title, content, writer } = data;
-    const thumbnail = await uploadImage(file, "article");
+    const { fileUrl, publicId } = await uploadImage(file, "article");
+
 
     const dataArticle = {
         title,
         content,
         writer,
         editorId: userId,
-        thumbnail: thumbnail.fileUrl
+        thumbnail: fileUrl,
+        publicId: publicId
     };
 
     const createArticle = await articleRepository.createArticle(dataArticle);
@@ -43,20 +45,23 @@ export const updateArticle = async (id, data, file) => {
 
     const { title, content, writer } = data;
     let thumbnail = article.thumbnail;
+    let publicId = article.publicId;
 
     if (file) {
-        if (thumbnail) {
-            await deleteImageFromGCS(thumbnail);
+        if (publicId) {
+            await deleteImageFromCloudinary(publicId);
         }
         const uploadResult = await uploadImage(file, "article");
         thumbnail = uploadResult.fileUrl;
+        publicId = uploadResult.publicId;
     }
 
     const dataArticle = {
         title,
         content,
         writer,
-        thumbnail: thumbnail
+        thumbnail: thumbnail,
+        publicId: publicId
     };
 
     const updateArticle = await articleRepository.updateArticle(id, dataArticle);
@@ -67,8 +72,8 @@ export const deleteArticle = async (id) => {
     const article = await articleRepository.getArticleById(id);
     if (!article) throw new NotFoundError("Artikel tidak ditemukan");
 
-    if (article.thumbnail) {
-        await deleteImageFromGCS(article.thumbnail);
+    if (article.publicId) {
+        await deleteImageFromCloudinary(article.publicId);
     }
 
     await articleRepository.deleteArticle(id);
